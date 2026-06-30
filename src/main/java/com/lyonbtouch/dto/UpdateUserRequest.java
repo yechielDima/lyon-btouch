@@ -15,7 +15,7 @@ public class UpdateUserRequest {
 
     private List<PositionCode> qualifications;
 
-    private boolean isChecker;
+    private Boolean isChecker;
 
     private Boolean active;
 
@@ -43,12 +43,12 @@ public class UpdateUserRequest {
         this.qualifications = qualifications;
     }
 
-    public boolean isChecker() {
+    public Boolean getIsChecker() {
         return isChecker;
     }
 
-    public void setChecker(boolean checker) {
-        isChecker = checker;
+    public void setIsChecker(Boolean isChecker) {
+        this.isChecker = isChecker;
     }
 
     public Boolean getActive() {

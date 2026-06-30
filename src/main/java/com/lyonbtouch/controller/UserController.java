@@ -59,7 +59,7 @@ public class UserController {
                                                     @Valid @RequestBody UpdateUserRequest request) {
         User user = managerService.updateUserProfile(
                 request.getManagerId(), id, request.getSystemRole(),
-                request.getQualifications(), request.isChecker(), request.getActive());
+                request.getQualifications(), request.getIsChecker(), request.getActive());
         return ResponseEntity.ok(DtoMapper.toUserResponse(user));
     }
 }

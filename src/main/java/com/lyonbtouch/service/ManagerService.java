@@ -58,13 +58,15 @@ public class ManagerService {
 
     @Transactional
     public User updateUserProfile(Long managerId, Long userId, SystemRole systemRole,
-                                  List<PositionCode> qualificationCodes, boolean isChecker,
+                                  List<PositionCode> qualificationCodes, Boolean isChecker,
                                   Boolean active) {
         User manager = requireManager(managerId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
 
-        validateCheckerFlag(isChecker, qualificationCodes);
+        if (isChecker != null && isChecker) {
+            validateCheckerFlagForUpdate(qualificationCodes, user);
+        }
 
         if (systemRole != null) {
             user.setSystemRole(systemRole);
@@ -72,7 +74,9 @@ public class ManagerService {
         if (qualificationCodes != null) {
             user.setQualifications(resolvePositions(qualificationCodes));
         }
-        user.setChecker(isChecker);
+        if (isChecker != null) {
+            user.setChecker(isChecker);
+        }
         if (active != null) {
             user.setActive(active);
         }
@@ -95,6 +99,20 @@ public class ManagerService {
     private void validateCheckerFlag(boolean isChecker, List<PositionCode> qualificationCodes) {
         if (isChecker && (qualificationCodes == null || !qualificationCodes.contains(PositionCode.WAITER))) {
             throw new BusinessRuleException("Checker flag requires WAITER qualification");
+        }
+    }
+
+    private void validateCheckerFlagForUpdate(List<PositionCode> qualificationCodes, User user) {
+        if (qualificationCodes != null) {
+            if (!qualificationCodes.contains(PositionCode.WAITER)) {
+                throw new BusinessRuleException("Checker flag requires WAITER qualification");
+            }
+        } else {
+            boolean hasWaiter = user.getQualifications().stream()
+                    .anyMatch(p -> p.getPositionCode() == PositionCode.WAITER);
+            if (!hasWaiter) {
+                throw new BusinessRuleException("Checker flag requires WAITER qualification");
+            }
         }
     }
 
