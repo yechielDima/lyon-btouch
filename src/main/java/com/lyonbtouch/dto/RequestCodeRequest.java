@@ -2,13 +2,10 @@ package com.lyonbtouch.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
-public class LoginRequest {
+public class RequestCodeRequest {
 
     @NotBlank
     private String phone;
-
-    @NotBlank
-    private String password;
 
     public String getPhone() {
         return phone;
@@ -16,13 +13,5 @@ public class LoginRequest {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }

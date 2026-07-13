@@ -35,6 +35,10 @@ public class AvailabilityService {
         Shift shift = shiftRepository.findById(shiftId)
                 .orElseThrow(() -> new ResourceNotFoundException("Shift not found: " + shiftId));
 
+        if (user.getSystemRole() == com.lyonbtouch.model.enums.SystemRole.SHIFT_MANAGER) {
+            throw new BusinessRuleException("Shift managers cannot submit availability; they are assigned directly by the manager");
+        }
+
         if (availabilityRepository.findByUserAndShift(user, shift).isPresent()) {
             throw new BusinessRuleException("Availability already submitted for this shift");
         }

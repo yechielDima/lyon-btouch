@@ -145,6 +145,10 @@ public class ScheduleService {
             throw new BusinessRuleException("User must have SHIFT_MANAGER role to be assigned as shift manager");
         }
 
+        if (scheduleEntryRepository.findByShiftAndUser(shift, user).isPresent()) {
+            throw new BusinessRuleException("Cannot assign as shift manager: user already has a schedule entry in this shift");
+        }
+
         shift.setShiftManager(user);
         Shift saved = shiftRepository.save(shift);
         auditService.log(managerId, "SHIFT_MANAGER_ASSIGN",
@@ -168,6 +172,10 @@ public class ScheduleService {
 
         if (scheduleEntryRepository.findByShiftAndUser(shift, user).isPresent()) {
             throw new BusinessRuleException("User already assigned to this shift");
+        }
+
+        if (shift.getShiftManager() != null && shift.getShiftManager().getId().equals(user.getId())) {
+            throw new BusinessRuleException("Cannot assign schedule entry: user is the shift manager for this shift");
         }
 
         ScheduleEntry entry = new ScheduleEntry();

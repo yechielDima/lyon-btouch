@@ -2,21 +2,13 @@ package com.lyonbtouch.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
-public class RegisterRequest {
-
-    @NotBlank
-    private String fullName;
+public class VerifyCodeRequest {
 
     @NotBlank
     private String phone;
 
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
+    @NotBlank
+    private String code;
 
     public String getPhone() {
         return phone;
@@ -24,5 +16,13 @@ public class RegisterRequest {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }

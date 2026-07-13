@@ -4,6 +4,6 @@ public enum ShiftType {
     MORNING,
     EVENING,
     FRIDAY,
-    SATURDAY,
+    MOTZASH,
     SPECIAL
 }

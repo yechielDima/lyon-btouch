@@ -23,9 +23,6 @@ public class User {
     @Column(nullable = false, unique = true)
     private String phone;
 
-    @Column(nullable = false)
-    private String passwordHash;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SystemRole systemRole;
@@ -77,14 +74,6 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
     }
 
     public SystemRole getSystemRole() {

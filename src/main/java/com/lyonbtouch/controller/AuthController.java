@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -20,13 +22,19 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
-        User user = userService.register(request.getFullName(), request.getPhone(), request.getPassword());
+        User user = userService.register(request.getFullName(), request.getPhone());
         return ResponseEntity.status(HttpStatus.CREATED).body(DtoMapper.toUserResponse(user));
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@Valid @RequestBody LoginRequest request) {
-        User user = userService.login(request.getPhone(), request.getPassword());
+    @PostMapping("/request-code")
+    public ResponseEntity<Map<String, String>> requestCode(@Valid @RequestBody RequestCodeRequest request) {
+        userService.requestCode(request.getPhone());
+        return ResponseEntity.ok(Map.of("message", "Code sent"));
+    }
+
+    @PostMapping("/verify-code")
+    public ResponseEntity<UserResponse> verifyCode(@Valid @RequestBody VerifyCodeRequest request) {
+        User user = userService.verifyCode(request.getPhone(), request.getCode());
         return ResponseEntity.ok(DtoMapper.toUserResponse(user));
     }
 }

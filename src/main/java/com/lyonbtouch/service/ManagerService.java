@@ -10,9 +10,11 @@ import com.lyonbtouch.model.enums.PositionCode;
 import com.lyonbtouch.model.enums.SystemRole;
 import com.lyonbtouch.repository.PositionRepository;
 import com.lyonbtouch.repository.UserRepository;
+import com.lyonbtouch.sms.SmsSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,13 +25,16 @@ public class ManagerService {
     private final UserRepository userRepository;
     private final PositionRepository positionRepository;
     private final AuditService auditService;
+    private final SmsSender smsSender;
 
     public ManagerService(UserRepository userRepository,
                           PositionRepository positionRepository,
-                          AuditService auditService) {
+                          AuditService auditService,
+                          SmsSender smsSender) {
         this.userRepository = userRepository;
         this.positionRepository = positionRepository;
         this.auditService = auditService;
+        this.smsSender = smsSender;
     }
 
     @Transactional
@@ -43,7 +48,20 @@ public class ManagerService {
             throw new BusinessRuleException("User is already approved");
         }
 
-        validateCheckerFlag(isChecker, qualificationCodes);
+        if (qualificationCodes == null) {
+            qualificationCodes = new ArrayList<>();
+        }
+
+        if (systemRole == SystemRole.SHIFT_MANAGER) {
+            if (!qualificationCodes.contains(PositionCode.WAITER)) {
+                qualificationCodes.add(PositionCode.WAITER);
+            }
+            isChecker = true;
+        }
+
+        if (isChecker && !qualificationCodes.contains(PositionCode.WAITER)) {
+            qualificationCodes.add(PositionCode.WAITER);
+        }
 
         user.setAccountStatus(AccountStatus.APPROVED);
         user.setSystemRole(systemRole);
@@ -53,6 +71,10 @@ public class ManagerService {
         User saved = userRepository.save(user);
         auditService.log(managerId, "USER_APPROVE",
                 "Approved user " + user.getFullName() + " with role " + systemRole);
+
+        smsSender.send(user.getPhone(),
+                "Your Lyon B'Touch account has been approved. Role: " + systemRole);
+
         return saved;
     }
 
@@ -64,19 +86,33 @@ public class ManagerService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
 
-        if (isChecker != null && isChecker) {
-            validateCheckerFlagForUpdate(qualificationCodes, user);
+        SystemRole effectiveRole = systemRole != null ? systemRole : user.getSystemRole();
+        boolean effectiveChecker = isChecker != null ? isChecker : user.isChecker();
+
+        Set<PositionCode> effectiveQualCodes;
+        if (qualificationCodes != null) {
+            effectiveQualCodes = new HashSet<>(qualificationCodes);
+        } else {
+            effectiveQualCodes = new HashSet<>();
+            for (Position p : user.getQualifications()) {
+                effectiveQualCodes.add(p.getPositionCode());
+            }
+        }
+
+        if (effectiveRole == SystemRole.SHIFT_MANAGER) {
+            effectiveQualCodes.add(PositionCode.WAITER);
+            effectiveChecker = true;
+        }
+
+        if (effectiveChecker) {
+            effectiveQualCodes.add(PositionCode.WAITER);
         }
 
         if (systemRole != null) {
             user.setSystemRole(systemRole);
         }
-        if (qualificationCodes != null) {
-            user.setQualifications(resolvePositions(qualificationCodes));
-        }
-        if (isChecker != null) {
-            user.setChecker(isChecker);
-        }
+        user.setQualifications(resolvePositions(new ArrayList<>(effectiveQualCodes)));
+        user.setChecker(effectiveChecker);
         if (active != null) {
             user.setActive(active);
         }
@@ -94,26 +130,6 @@ public class ManagerService {
             throw new UnauthorizedException("Only managers can perform this action");
         }
         return manager;
-    }
-
-    private void validateCheckerFlag(boolean isChecker, List<PositionCode> qualificationCodes) {
-        if (isChecker && (qualificationCodes == null || !qualificationCodes.contains(PositionCode.WAITER))) {
-            throw new BusinessRuleException("Checker flag requires WAITER qualification");
-        }
-    }
-
-    private void validateCheckerFlagForUpdate(List<PositionCode> qualificationCodes, User user) {
-        if (qualificationCodes != null) {
-            if (!qualificationCodes.contains(PositionCode.WAITER)) {
-                throw new BusinessRuleException("Checker flag requires WAITER qualification");
-            }
-        } else {
-            boolean hasWaiter = user.getQualifications().stream()
-                    .anyMatch(p -> p.getPositionCode() == PositionCode.WAITER);
-            if (!hasWaiter) {
-                throw new BusinessRuleException("Checker flag requires WAITER qualification");
-            }
-        }
     }
 
     private Set<Position> resolvePositions(List<PositionCode> codes) {
