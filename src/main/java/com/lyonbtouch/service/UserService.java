@@ -103,7 +103,7 @@ public class UserService {
         otpCodeRepository.save(otp);
 
         auditService.log(user.getId(), "OTP_VERIFIED", "Login via OTP for " + phone);
-        user.getQualifications().size(); // Initialize lazy collection
+        user.getQualifications().size();
         return user;
     }
 
