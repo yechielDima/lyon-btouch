@@ -6,6 +6,7 @@ class ApiClient {
 
     const config: RequestInit = {
       ...options,
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
@@ -18,7 +19,9 @@ class ApiClient {
       let message = `שגיאה ${response.status}`
       try {
         const body = await response.json()
-        if (body.message) {
+        if (body.messages && body.messages.length > 0) {
+          message = body.messages[0]
+        } else if (body.message) {
           message = body.message
         }
       } catch {

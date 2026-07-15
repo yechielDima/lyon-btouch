@@ -1,7 +1,8 @@
-import { useState, type FormEvent } from 'react'
+import { useState, useEffect, type FormEvent } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { api } from '../../api/client'
-import type { RequestCodeRequest, VerifyCodeRequest, UserResponse } from '../../api/types'
+import { useAuth } from '../../context/AuthContext'
+import type { RequestCodeRequest, VerifyCodeRequest } from '../../api/types'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -11,6 +12,13 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [codeSentMessage, setCodeSentMessage] = useState('')
+  const { user, checkAuth } = useAuth()
+
+  useEffect(() => {
+    if (user) {
+      navigate('/home')
+    }
+  }, [user, navigate])
 
   const handleRequestCode = async (e: FormEvent) => {
     e.preventDefault()
@@ -36,8 +44,8 @@ export default function LoginPage() {
 
     try {
       const body: VerifyCodeRequest = { phone, code }
-      const user = await api.post<UserResponse>('/auth/verify-code', body)
-      localStorage.setItem('currentUser', JSON.stringify(user))
+      await api.post('/auth/verify-code', body)
+      await checkAuth()
       navigate('/home')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'שגיאה לא צפויה')

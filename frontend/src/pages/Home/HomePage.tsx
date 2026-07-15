@@ -1,26 +1,12 @@
-import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { User } from '../../api/types'
+import { useAuth } from '../../context/AuthContext'
 
 export default function HomePage() {
   const navigate = useNavigate()
-  const [user, setUser] = useState<User | null>(null)
+  const { user, logout } = useAuth()
 
-  useEffect(() => {
-    const stored = localStorage.getItem('currentUser')
-    if (!stored) {
-      navigate('/login')
-      return
-    }
-    try {
-      setUser(JSON.parse(stored))
-    } catch {
-      navigate('/login')
-    }
-  }, [navigate])
-
-  const handleLogout = () => {
-    localStorage.removeItem('currentUser')
+  const handleLogout = async () => {
+    await logout()
     navigate('/login')
   }
 
