@@ -21,10 +21,13 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
+            .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint(new org.springframework.security.web.authentication.HttpStatusEntryPoint(org.springframework.http.HttpStatus.UNAUTHORIZED))
+                .accessDeniedHandler((request, response, accessDeniedException) -> response.setStatus(org.springframework.http.HttpStatus.FORBIDDEN.value()))
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/register", "/api/auth/request-code", "/api/auth/verify-code").permitAll()
                 
-                // Manager endpoints
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/users/pending").hasRole("MANAGER")
                 .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/users/*/approve").hasRole("MANAGER")
                 .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/users/*").hasRole("MANAGER")
