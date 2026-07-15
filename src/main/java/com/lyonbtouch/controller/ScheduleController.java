@@ -23,7 +23,7 @@ public class ScheduleController {
 
     @PostMapping("/schedule-weeks")
     public ResponseEntity<ScheduleWeekResponse> createWeek(@Valid @RequestBody CreateWeekRequest request) {
-        ScheduleWeek week = scheduleService.createWeek(request.getManagerId(), request.getWeekStartDate());
+        ScheduleWeek week = scheduleService.createWeek(request.getWeekStartDate());
         return ResponseEntity.status(HttpStatus.CREATED).body(DtoMapper.toWeekResponse(week));
     }
 
@@ -42,16 +42,15 @@ public class ScheduleController {
     }
 
     @PutMapping("/schedule-weeks/{id}/publish")
-    public ResponseEntity<ScheduleWeekResponse> publishWeek(@PathVariable Long id,
-                                                             @RequestParam Long managerId) {
-        ScheduleWeek week = scheduleService.publishWeek(managerId, id);
+    public ResponseEntity<ScheduleWeekResponse> publishWeek(@PathVariable Long id) {
+        ScheduleWeek week = scheduleService.publishWeek(id);
         return ResponseEntity.ok(DtoMapper.toWeekResponse(week));
     }
 
     @PostMapping("/shifts")
     public ResponseEntity<ShiftResponse> addShift(@Valid @RequestBody AddShiftRequest request) {
         Shift shift = scheduleService.addShift(
-                request.getManagerId(), request.getWeekId(),
+                request.getWeekId(),
                 request.getShiftDate(), request.getShiftType());
         return ResponseEntity.status(HttpStatus.CREATED).body(DtoMapper.toShiftResponse(shift));
     }
@@ -73,7 +72,7 @@ public class ScheduleController {
     @PutMapping("/shifts/{id}/shift-manager")
     public ResponseEntity<ShiftResponse> assignShiftManager(@PathVariable Long id,
                                                              @Valid @RequestBody AssignShiftManagerRequest request) {
-        Shift shift = scheduleService.assignShiftManager(request.getManagerId(), id, request.getUserId());
+        Shift shift = scheduleService.assignShiftManager(id, request.getUserId());
         return ResponseEntity.ok(DtoMapper.toShiftResponse(shift));
     }
 
@@ -81,7 +80,7 @@ public class ScheduleController {
     public ResponseEntity<ShiftRequirementResponse> setShiftRequirement(@PathVariable Long id,
                                                                          @Valid @RequestBody ShiftRequirementRequest request) {
         ShiftRequirement req = scheduleService.setShiftRequirement(
-                request.getManagerId(), id, request.getPositionCode(), request.getRequiredCount());
+                id, request.getPositionCode(), request.getRequiredCount());
         return ResponseEntity.ok(DtoMapper.toRequirementResponse(req));
     }
 
@@ -96,14 +95,14 @@ public class ScheduleController {
     @PostMapping("/schedule-entries")
     public ResponseEntity<ScheduleEntryResponse> assignEntry(@Valid @RequestBody AssignEntryRequest request) {
         ScheduleEntry entry = scheduleService.assignEntry(
-                request.getManagerId(), request.getShiftId(),
+                request.getShiftId(),
                 request.getUserId(), request.getPositionCode());
         return ResponseEntity.status(HttpStatus.CREATED).body(DtoMapper.toEntryResponse(entry));
     }
 
     @DeleteMapping("/schedule-entries/{id}")
-    public ResponseEntity<Void> removeEntry(@PathVariable Long id, @RequestParam Long managerId) {
-        scheduleService.removeEntry(managerId, id);
+    public ResponseEntity<Void> removeEntry(@PathVariable Long id) {
+        scheduleService.removeEntry(id);
         return ResponseEntity.noContent().build();
     }
 

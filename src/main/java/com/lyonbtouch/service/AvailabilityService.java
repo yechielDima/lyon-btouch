@@ -29,7 +29,8 @@ public class AvailabilityService {
     }
 
     @Transactional
-    public Availability submitAvailability(Long userId, Long shiftId) {
+    public Availability submitAvailability(Long shiftId) {
+        Long userId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
         Shift shift = shiftRepository.findById(shiftId)
@@ -50,7 +51,8 @@ public class AvailabilityService {
     }
 
     @Transactional
-    public void removeAvailability(Long userId, Long shiftId) {
+    public void removeAvailability(Long shiftId) {
+        Long userId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
         Shift shift = shiftRepository.findById(shiftId)

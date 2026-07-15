@@ -9,22 +9,11 @@ import java.util.List;
 public class ApproveUserRequest {
 
     @NotNull
-    private Long managerId;
-
-    @NotNull
     private SystemRole systemRole;
 
     private List<PositionCode> qualifications;
 
     private boolean isChecker;
-
-    public Long getManagerId() {
-        return managerId;
-    }
-
-    public void setManagerId(Long managerId) {
-        this.managerId = managerId;
-    }
 
     public SystemRole getSystemRole() {
         return systemRole;

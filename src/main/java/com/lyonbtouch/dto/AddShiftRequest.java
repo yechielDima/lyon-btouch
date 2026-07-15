@@ -6,10 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 public class AddShiftRequest {
-
-    @NotNull
-    private Long managerId;
-
     @NotNull
     private Long weekId;
 
@@ -18,15 +14,6 @@ public class AddShiftRequest {
 
     @NotNull
     private ShiftType shiftType;
-
-    public Long getManagerId() {
-        return managerId;
-    }
-
-    public void setManagerId(Long managerId) {
-        this.managerId = managerId;
-    }
-
     public Long getWeekId() {
         return weekId;
     }

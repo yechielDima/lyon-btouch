@@ -34,7 +34,8 @@ public class SwapService {
     }
 
     @Transactional
-    public SwapRequest openForSwap(Long userId, Long entryId) {
+    public SwapRequest openForSwap(Long entryId) {
+        Long userId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
         ScheduleEntry entry = scheduleEntryRepository.findById(entryId)
@@ -63,7 +64,8 @@ public class SwapService {
     }
 
     @Transactional
-    public SwapRequest offerToCover(Long userId, Long swapRequestId) {
+    public SwapRequest offerToCover(Long swapRequestId) {
+        Long userId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User coveringUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
         SwapRequest swap = swapRequestRepository.findById(swapRequestId)
@@ -92,7 +94,8 @@ public class SwapService {
     }
 
     @Transactional
-    public SwapRequest approveSwap(Long approverId, Long swapRequestId) {
+    public SwapRequest approveSwap(Long swapRequestId) {
+        Long approverId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User approver = userRepository.findById(approverId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + approverId));
         SwapRequest swap = swapRequestRepository.findById(swapRequestId)
@@ -123,7 +126,8 @@ public class SwapService {
     }
 
     @Transactional
-    public SwapRequest rejectSwap(Long approverId, Long swapRequestId) {
+    public SwapRequest rejectSwap(Long swapRequestId) {
+        Long approverId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User approver = userRepository.findById(approverId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + approverId));
         SwapRequest swap = swapRequestRepository.findById(swapRequestId)
@@ -145,7 +149,8 @@ public class SwapService {
     }
 
     @Transactional
-    public SwapRequest cancelSwap(Long userId, Long swapRequestId) {
+    public SwapRequest cancelSwap(Long swapRequestId) {
+        Long userId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
         SwapRequest swap = swapRequestRepository.findById(swapRequestId)

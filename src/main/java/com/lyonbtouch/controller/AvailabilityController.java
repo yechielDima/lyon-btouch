@@ -23,13 +23,13 @@ public class AvailabilityController {
 
     @PostMapping("/availability")
     public ResponseEntity<AvailabilityResponse> submitAvailability(@Valid @RequestBody AvailabilityRequest request) {
-        Availability availability = availabilityService.submitAvailability(request.getUserId(), request.getShiftId());
+        Availability availability = availabilityService.submitAvailability(request.getShiftId());
         return ResponseEntity.status(HttpStatus.CREATED).body(DtoMapper.toAvailabilityResponse(availability));
     }
 
     @DeleteMapping("/availability")
-    public ResponseEntity<Void> removeAvailability(@RequestParam Long userId, @RequestParam Long shiftId) {
-        availabilityService.removeAvailability(userId, shiftId);
+    public ResponseEntity<Void> removeAvailability(@RequestParam Long shiftId) {
+        availabilityService.removeAvailability(shiftId);
         return ResponseEntity.noContent().build();
     }
 

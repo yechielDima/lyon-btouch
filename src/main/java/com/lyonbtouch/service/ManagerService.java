@@ -38,8 +38,9 @@ public class ManagerService {
     }
 
     @Transactional
-    public User approveUser(Long managerId, Long userId, SystemRole systemRole,
+    public User approveUser(Long userId, SystemRole systemRole,
                             List<PositionCode> qualificationCodes, boolean isChecker) {
+        Long managerId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User manager = requireManager(managerId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
@@ -79,9 +80,10 @@ public class ManagerService {
     }
 
     @Transactional
-    public User updateUserProfile(Long managerId, Long userId, SystemRole systemRole,
+    public User updateUserProfile(Long userId, SystemRole systemRole,
                                   List<PositionCode> qualificationCodes, Boolean isChecker,
                                   Boolean active) {
+        Long managerId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User manager = requireManager(managerId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));

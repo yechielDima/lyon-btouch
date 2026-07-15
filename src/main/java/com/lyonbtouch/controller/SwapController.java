@@ -24,35 +24,34 @@ public class SwapController {
 
     @PostMapping
     public ResponseEntity<SwapRequestResponse> openForSwap(@Valid @RequestBody SwapOpenRequest request) {
-        SwapRequest swap = swapService.openForSwap(request.getUserId(), request.getEntryId());
+        SwapRequest swap = swapService.openForSwap(request.getEntryId());
         return ResponseEntity.status(HttpStatus.CREATED).body(DtoMapper.toSwapResponse(swap));
     }
 
     @PutMapping("/{id}/offer")
     public ResponseEntity<SwapRequestResponse> offerToCover(@PathVariable Long id,
                                                              @Valid @RequestBody SwapOfferRequest request) {
-        SwapRequest swap = swapService.offerToCover(request.getUserId(), id);
+        SwapRequest swap = swapService.offerToCover(id);
         return ResponseEntity.ok(DtoMapper.toSwapResponse(swap));
     }
 
     @PutMapping("/{id}/approve")
     public ResponseEntity<SwapRequestResponse> approveSwap(@PathVariable Long id,
                                                             @Valid @RequestBody SwapActionRequest request) {
-        SwapRequest swap = swapService.approveSwap(request.getApproverId(), id);
+        SwapRequest swap = swapService.approveSwap(id);
         return ResponseEntity.ok(DtoMapper.toSwapResponse(swap));
     }
 
     @PutMapping("/{id}/reject")
     public ResponseEntity<SwapRequestResponse> rejectSwap(@PathVariable Long id,
                                                            @Valid @RequestBody SwapActionRequest request) {
-        SwapRequest swap = swapService.rejectSwap(request.getApproverId(), id);
+        SwapRequest swap = swapService.rejectSwap(id);
         return ResponseEntity.ok(DtoMapper.toSwapResponse(swap));
     }
 
     @PutMapping("/{id}/cancel")
-    public ResponseEntity<SwapRequestResponse> cancelSwap(@PathVariable Long id,
-                                                           @RequestParam Long userId) {
-        SwapRequest swap = swapService.cancelSwap(userId, id);
+    public ResponseEntity<SwapRequestResponse> cancelSwap(@PathVariable Long id) {
+        SwapRequest swap = swapService.cancelSwap(id);
         return ResponseEntity.ok(DtoMapper.toSwapResponse(swap));
     }
 

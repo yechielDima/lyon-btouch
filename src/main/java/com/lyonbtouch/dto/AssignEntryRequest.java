@@ -4,10 +4,6 @@ import com.lyonbtouch.model.enums.PositionCode;
 import jakarta.validation.constraints.NotNull;
 
 public class AssignEntryRequest {
-
-    @NotNull
-    private Long managerId;
-
     @NotNull
     private Long shiftId;
 
@@ -16,15 +12,6 @@ public class AssignEntryRequest {
 
     @NotNull
     private PositionCode positionCode;
-
-    public Long getManagerId() {
-        return managerId;
-    }
-
-    public void setManagerId(Long managerId) {
-        this.managerId = managerId;
-    }
-
     public Long getShiftId() {
         return shiftId;
     }

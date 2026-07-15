@@ -49,7 +49,7 @@ public class UserController {
     public ResponseEntity<UserResponse> approveUser(@PathVariable Long id,
                                                      @Valid @RequestBody ApproveUserRequest request) {
         User user = managerService.approveUser(
-                request.getManagerId(), id, request.getSystemRole(),
+                id, request.getSystemRole(),
                 request.getQualifications(), request.isChecker());
         return ResponseEntity.ok(DtoMapper.toUserResponse(user));
     }
@@ -58,7 +58,7 @@ public class UserController {
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long id,
                                                     @Valid @RequestBody UpdateUserRequest request) {
         User user = managerService.updateUserProfile(
-                request.getManagerId(), id, request.getSystemRole(),
+                id, request.getSystemRole(),
                 request.getQualifications(), request.getIsChecker(), request.getActive());
         return ResponseEntity.ok(DtoMapper.toUserResponse(user));
     }

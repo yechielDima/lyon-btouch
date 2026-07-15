@@ -7,10 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public class UpdateUserRequest {
-
-    @NotNull
-    private Long managerId;
-
     private SystemRole systemRole;
 
     private List<PositionCode> qualifications;
@@ -18,15 +14,6 @@ public class UpdateUserRequest {
     private Boolean isChecker;
 
     private Boolean active;
-
-    public Long getManagerId() {
-        return managerId;
-    }
-
-    public void setManagerId(Long managerId) {
-        this.managerId = managerId;
-    }
-
     public SystemRole getSystemRole() {
         return systemRole;
     }

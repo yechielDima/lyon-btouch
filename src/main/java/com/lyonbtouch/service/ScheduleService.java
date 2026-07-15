@@ -44,7 +44,8 @@ public class ScheduleService {
     }
 
     @Transactional
-    public ScheduleWeek createWeek(Long managerId, LocalDate weekStartDate) {
+    public ScheduleWeek createWeek(LocalDate weekStartDate) {
+        Long managerId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User manager = requireManager(managerId);
 
         if (scheduleWeekRepository.findByWeekStartDate(weekStartDate).isPresent()) {
@@ -70,7 +71,8 @@ public class ScheduleService {
     }
 
     @Transactional
-    public Shift addShift(Long managerId, Long weekId, LocalDate shiftDate, ShiftType shiftType) {
+    public Shift addShift(Long weekId, LocalDate shiftDate, ShiftType shiftType) {
+        Long managerId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User manager = requireManager(managerId);
         ScheduleWeek week = scheduleWeekRepository.findById(weekId)
                 .orElseThrow(() -> new ResourceNotFoundException("ScheduleWeek not found: " + weekId));
@@ -106,8 +108,9 @@ public class ScheduleService {
     }
 
     @Transactional
-    public ShiftRequirement setShiftRequirement(Long managerId, Long shiftId,
+    public ShiftRequirement setShiftRequirement(Long shiftId,
                                                  PositionCode positionCode, int requiredCount) {
+        Long managerId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User manager = requireManager(managerId);
         Shift shift = shiftRepository.findById(shiftId)
                 .orElseThrow(() -> new ResourceNotFoundException("Shift not found: " + shiftId));
@@ -134,7 +137,8 @@ public class ScheduleService {
     }
 
     @Transactional
-    public Shift assignShiftManager(Long managerId, Long shiftId, Long userId) {
+    public Shift assignShiftManager(Long shiftId, Long userId) {
+        Long managerId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User manager = requireManager(managerId);
         Shift shift = shiftRepository.findById(shiftId)
                 .orElseThrow(() -> new ResourceNotFoundException("Shift not found: " + shiftId));
@@ -157,7 +161,8 @@ public class ScheduleService {
     }
 
     @Transactional
-    public ScheduleEntry assignEntry(Long managerId, Long shiftId, Long userId, PositionCode positionCode) {
+    public ScheduleEntry assignEntry(Long shiftId, Long userId, PositionCode positionCode) {
+        Long managerId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User manager = requireManager(managerId);
         Shift shift = shiftRepository.findById(shiftId)
                 .orElseThrow(() -> new ResourceNotFoundException("Shift not found: " + shiftId));
@@ -192,7 +197,8 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void removeEntry(Long managerId, Long entryId) {
+    public void removeEntry(Long entryId) {
+        Long managerId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User manager = requireManager(managerId);
         ScheduleEntry entry = scheduleEntryRepository.findById(entryId)
                 .orElseThrow(() -> new ResourceNotFoundException("ScheduleEntry not found: " + entryId));
@@ -209,7 +215,8 @@ public class ScheduleService {
     }
 
     @Transactional
-    public ScheduleWeek publishWeek(Long managerId, Long weekId) {
+    public ScheduleWeek publishWeek(Long weekId) {
+        Long managerId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User manager = requireManager(managerId);
         ScheduleWeek week = scheduleWeekRepository.findById(weekId)
                 .orElseThrow(() -> new ResourceNotFoundException("ScheduleWeek not found: " + weekId));
