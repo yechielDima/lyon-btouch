@@ -107,9 +107,12 @@ public class UserService {
         return user;
     }
 
+    @Transactional(readOnly = true)
     public User getUser(Long id) {
-        return userRepository.findById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
+        user.getQualifications().size();
+        return user;
     }
 
     public List<User> getPendingUsers() {
