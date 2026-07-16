@@ -25,6 +25,16 @@ export default function HomePage() {
         <p className="text-slate-500 text-sm mb-8">
           ניקוד אמינות: {user.reliabilityScore}
         </p>
+
+        {user.systemRole === 'MANAGER' && (
+          <button
+            onClick={() => navigate('/approvals')}
+            className="w-full py-3 mb-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition-colors cursor-pointer"
+          >
+            אישור עובדים
+          </button>
+        )}
+
         <button
           onClick={handleLogout}
           className="w-full py-3 rounded-xl bg-red-500/80 hover:bg-red-500 text-white font-semibold transition-colors cursor-pointer"

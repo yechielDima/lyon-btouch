@@ -46,6 +46,12 @@ export interface VerifyCodeRequest {
 
 export interface UserResponse extends User {}
 
+export interface ApproveUserRequest {
+  systemRole: SystemRole
+  qualifications: string[]
+  isChecker: boolean
+}
+
 export interface ApiError {
   message: string
   status: number
