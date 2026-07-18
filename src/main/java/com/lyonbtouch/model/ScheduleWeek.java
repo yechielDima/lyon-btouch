@@ -19,7 +19,7 @@ public class ScheduleWeek {
     private LocalDate weekStartDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
     private WeekStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)

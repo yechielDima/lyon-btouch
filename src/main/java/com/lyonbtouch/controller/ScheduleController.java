@@ -47,6 +47,24 @@ public class ScheduleController {
         return ResponseEntity.ok(DtoMapper.toWeekResponse(week));
     }
 
+    @PutMapping("/schedule-weeks/{id}/open")
+    public ResponseEntity<ScheduleWeekResponse> openWeek(@PathVariable Long id) {
+        ScheduleWeek week = scheduleService.openWeek(id);
+        return ResponseEntity.ok(DtoMapper.toWeekResponse(week));
+    }
+
+    @PostMapping("/schedule-weeks/scaffold")
+    public ResponseEntity<ScheduleWeekResponse> scaffoldWeek(@Valid @RequestBody ScaffoldWeekRequest request) {
+        ScheduleWeek week = scheduleService.scaffoldWeek(request.getWeekStartDate());
+        return ResponseEntity.status(HttpStatus.CREATED).body(DtoMapper.toWeekResponse(week));
+    }
+
+    @DeleteMapping("/shifts/{id}")
+    public ResponseEntity<Void> deleteShift(@PathVariable Long id) {
+        scheduleService.deleteShift(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/shifts")
     public ResponseEntity<ShiftResponse> addShift(@Valid @RequestBody AddShiftRequest request) {
         Shift shift = scheduleService.addShift(

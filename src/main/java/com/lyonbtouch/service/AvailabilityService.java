@@ -36,6 +36,10 @@ public class AvailabilityService {
         Shift shift = shiftRepository.findById(shiftId)
                 .orElseThrow(() -> new ResourceNotFoundException("Shift not found: " + shiftId));
 
+        if (shift.getWeek().getStatus() != com.lyonbtouch.model.enums.WeekStatus.OPEN_FOR_SUBMISSION) {
+            throw new BusinessRuleException("This week is not open for availability submission");
+        }
+
         if (user.getSystemRole() == com.lyonbtouch.model.enums.SystemRole.SHIFT_MANAGER) {
             throw new BusinessRuleException("Shift managers cannot submit availability; they are assigned directly by the manager");
         }
@@ -57,6 +61,10 @@ public class AvailabilityService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
         Shift shift = shiftRepository.findById(shiftId)
                 .orElseThrow(() -> new ResourceNotFoundException("Shift not found: " + shiftId));
+
+        if (shift.getWeek().getStatus() != com.lyonbtouch.model.enums.WeekStatus.OPEN_FOR_SUBMISSION) {
+            throw new BusinessRuleException("This week is not open for availability submission");
+        }
 
         Availability availability = availabilityRepository.findByUserAndShift(user, shift)
                 .orElseThrow(() -> new ResourceNotFoundException("Availability not found"));
