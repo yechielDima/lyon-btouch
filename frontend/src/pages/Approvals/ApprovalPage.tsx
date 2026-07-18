@@ -59,7 +59,6 @@ export default function ApprovalPage() {
   const handleCheckerChange = (userId: number, checked: boolean) => {
     setForms(prev => {
       const state = { ...prev[userId] }
-      // SHIFT_MANAGER forces checker to remain true
       if (state.systemRole === SystemRole.SHIFT_MANAGER) {
         return prev
       }
@@ -75,7 +74,6 @@ export default function ApprovalPage() {
     setForms(prev => {
       const state = { ...prev[userId] }
       
-      // Prevent removing WAITER if SHIFT_MANAGER or isChecker
       if (qual === PositionCode.WAITER && (state.systemRole === SystemRole.SHIFT_MANAGER || state.isChecker)) {
         return prev
       }
