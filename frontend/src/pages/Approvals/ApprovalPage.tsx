@@ -176,7 +176,7 @@ export default function ApprovalPage() {
                           { value: PositionCode.WAITER, label: 'מלצר' },
                           { value: PositionCode.BARTENDER, label: 'ברמן' },
                           { value: PositionCode.COOK, label: 'טבח' },
-                          { value: PositionCode.HOST, label: 'מארחת' }
+                          { value: PositionCode.HOSTESS, label: 'מארחת' }
                         ].map(pos => {
                           const isWaiterLocked = pos.value === PositionCode.WAITER && 
                                                (form.systemRole === SystemRole.SHIFT_MANAGER || form.isChecker);

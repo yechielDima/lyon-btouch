@@ -13,8 +13,21 @@ export enum AccountStatus {
 export enum PositionCode {
   WAITER = 'WAITER',
   BARTENDER = 'BARTENDER',
-  HOST = 'HOST',
+  HOSTESS = 'HOSTESS',
   COOK = 'COOK',
+}
+
+export enum WeekStatus {
+  DRAFT = 'DRAFT',
+  OPEN_FOR_SUBMISSION = 'OPEN_FOR_SUBMISSION',
+  PUBLISHED = 'PUBLISHED',
+}
+
+export enum ShiftType {
+  MORNING = 'MORNING',
+  EVENING = 'EVENING',
+  FRIDAY = 'FRIDAY',
+  MOTZASH = 'MOTZASH',
 }
 
 export interface User {
@@ -50,6 +63,40 @@ export interface ApproveUserRequest {
   systemRole: SystemRole
   qualifications: string[]
   isChecker: boolean
+}
+
+export interface ScheduleWeekResponse {
+  id: number
+  weekStartDate: string
+  status: WeekStatus
+  publishedAt: string | null
+  generatedAt: string | null
+  generatedByUserId: number | null
+  createdAt: string
+}
+
+export interface ShiftResponse {
+  id: number
+  weekId: number
+  shiftDate: string
+  shiftType: ShiftType
+  shiftManagerId: number | null
+}
+
+export interface ShiftRequirementResponse {
+  id: number
+  shiftId: number
+  positionCode: PositionCode
+  requiredCount: number
+}
+
+export interface ShiftRequirementRequest {
+  positionCode: PositionCode
+  requiredCount: number
+}
+
+export interface ScaffoldWeekRequest {
+  weekStartDate: string
 }
 
 export interface ApiError {

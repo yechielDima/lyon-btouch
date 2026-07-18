@@ -104,6 +104,7 @@ public class ScheduleService {
                 .orElseThrow(() -> new ResourceNotFoundException("Shift not found: " + shiftId));
     }
 
+    @Transactional(readOnly = true)
     public List<Shift> getShiftsForWeek(Long weekId) {
         ScheduleWeek week = scheduleWeekRepository.findById(weekId)
                 .orElseThrow(() -> new ResourceNotFoundException("ScheduleWeek not found: " + weekId));
@@ -133,6 +134,7 @@ public class ScheduleService {
         return shiftRequirementRepository.save(requirement);
     }
 
+    @Transactional(readOnly = true)
     public List<ShiftRequirement> getRequirementsForShift(Long shiftId) {
         Shift shift = shiftRepository.findById(shiftId)
                 .orElseThrow(() -> new ResourceNotFoundException("Shift not found: " + shiftId));
@@ -211,6 +213,7 @@ public class ScheduleService {
                 "Removed schedule entry " + entryId);
     }
 
+    @Transactional(readOnly = true)
     public List<ScheduleEntry> getEntriesForShift(Long shiftId) {
         Shift shift = shiftRepository.findById(shiftId)
                 .orElseThrow(() -> new ResourceNotFoundException("Shift not found: " + shiftId));
