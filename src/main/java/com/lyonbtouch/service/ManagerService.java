@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import com.lyonbtouch.dto.DtoMapper;
+import com.lyonbtouch.dto.UserResponse;
 
 @Service
 public class ManagerService {
@@ -38,7 +40,7 @@ public class ManagerService {
     }
 
     @Transactional
-    public User approveUser(Long userId, SystemRole systemRole,
+    public UserResponse approveUser(Long userId, SystemRole systemRole,
                             List<PositionCode> qualificationCodes, boolean isChecker) {
         Long managerId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User manager = requireManager(managerId);
@@ -76,11 +78,11 @@ public class ManagerService {
         smsSender.send(user.getPhone(),
                 "Your Lyon B'Touch account has been approved. Role: " + systemRole);
 
-        return saved;
+        return DtoMapper.toUserResponse(saved);
     }
 
     @Transactional
-    public User updateUserProfile(Long userId, SystemRole systemRole,
+    public UserResponse updateUserProfile(Long userId, SystemRole systemRole,
                                   List<PositionCode> qualificationCodes, Boolean isChecker,
                                   Boolean active) {
         Long managerId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
@@ -122,7 +124,7 @@ public class ManagerService {
         User saved = userRepository.save(user);
         auditService.log(managerId, "USER_UPDATE",
                 "Updated profile for user " + user.getFullName());
-        return saved;
+        return DtoMapper.toUserResponse(saved);
     }
 
     private User requireManager(Long managerId) {

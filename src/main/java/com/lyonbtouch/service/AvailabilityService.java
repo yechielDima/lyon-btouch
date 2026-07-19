@@ -1,5 +1,7 @@
 package com.lyonbtouch.service;
 
+import com.lyonbtouch.dto.AvailabilityResponse;
+import com.lyonbtouch.dto.DtoMapper;
 import com.lyonbtouch.exception.BusinessRuleException;
 import com.lyonbtouch.exception.ResourceNotFoundException;
 import com.lyonbtouch.model.Availability;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AvailabilityService {
@@ -29,7 +32,7 @@ public class AvailabilityService {
     }
 
     @Transactional
-    public Availability submitAvailability(Long shiftId) {
+    public AvailabilityResponse submitAvailability(Long shiftId) {
         Long userId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
@@ -51,7 +54,7 @@ public class AvailabilityService {
         Availability availability = new Availability();
         availability.setUser(user);
         availability.setShift(shift);
-        return availabilityRepository.save(availability);
+        return DtoMapper.toAvailabilityResponse(availabilityRepository.save(availability));
     }
 
     @Transactional
@@ -72,15 +75,21 @@ public class AvailabilityService {
         availabilityRepository.delete(availability);
     }
 
-    public List<Availability> getAvailabilityForShift(Long shiftId) {
+    @Transactional(readOnly = true)
+    public List<AvailabilityResponse> getAvailabilityForShift(Long shiftId) {
         Shift shift = shiftRepository.findById(shiftId)
                 .orElseThrow(() -> new ResourceNotFoundException("Shift not found: " + shiftId));
-        return availabilityRepository.findByShift(shift);
+        return availabilityRepository.findByShift(shift).stream()
+                .map(DtoMapper::toAvailabilityResponse)
+                .collect(Collectors.toList());
     }
 
-    public List<Availability> getAvailabilityForUser(Long userId) {
+    @Transactional(readOnly = true)
+    public List<AvailabilityResponse> getAvailabilityForUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
-        return availabilityRepository.findByUser(user);
+        return availabilityRepository.findByUser(user).stream()
+                .map(DtoMapper::toAvailabilityResponse)
+                .collect(Collectors.toList());
     }
 }

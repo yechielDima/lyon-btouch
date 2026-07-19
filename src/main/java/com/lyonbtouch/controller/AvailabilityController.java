@@ -23,8 +23,8 @@ public class AvailabilityController {
 
     @PostMapping("/availability")
     public ResponseEntity<AvailabilityResponse> submitAvailability(@Valid @RequestBody AvailabilityRequest request) {
-        Availability availability = availabilityService.submitAvailability(request.getShiftId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(DtoMapper.toAvailabilityResponse(availability));
+        AvailabilityResponse response = availabilityService.submitAvailability(request.getShiftId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/availability")
@@ -35,17 +35,13 @@ public class AvailabilityController {
 
     @GetMapping("/shifts/{shiftId}/availability")
     public ResponseEntity<List<AvailabilityResponse>> getAvailabilityForShift(@PathVariable Long shiftId) {
-        List<AvailabilityResponse> list = availabilityService.getAvailabilityForShift(shiftId).stream()
-                .map(DtoMapper::toAvailabilityResponse)
-                .collect(Collectors.toList());
+        List<AvailabilityResponse> list = availabilityService.getAvailabilityForShift(shiftId);
         return ResponseEntity.ok(list);
     }
 
     @GetMapping("/users/{userId}/availability")
     public ResponseEntity<List<AvailabilityResponse>> getAvailabilityForUser(@PathVariable Long userId) {
-        List<AvailabilityResponse> list = availabilityService.getAvailabilityForUser(userId).stream()
-                .map(DtoMapper::toAvailabilityResponse)
-                .collect(Collectors.toList());
+        List<AvailabilityResponse> list = availabilityService.getAvailabilityForUser(userId);
         return ResponseEntity.ok(list);
     }
 }

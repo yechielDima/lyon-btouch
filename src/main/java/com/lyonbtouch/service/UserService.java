@@ -15,6 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
+import com.lyonbtouch.dto.DtoMapper;
+import com.lyonbtouch.dto.UserResponse;
 
 @Service
 public class UserService {
@@ -35,7 +38,7 @@ public class UserService {
     }
 
     @Transactional
-    public User register(String fullName, String phone) {
+    public UserResponse register(String fullName, String phone) {
         if (userRepository.findByPhone(phone).isPresent()) {
             throw new BusinessRuleException("Phone number already registered: " + phone);
         }
@@ -55,7 +58,7 @@ public class UserService {
                     "New pending registration: " + fullName + " (" + phone + ")");
         }
 
-        return saved;
+        return DtoMapper.toUserResponse(saved);
     }
 
     @Transactional
@@ -84,7 +87,7 @@ public class UserService {
     }
 
     @Transactional
-    public User verifyCode(String phone, String code) {
+    public UserResponse verifyCode(String phone, String code) {
         User user = userRepository.findByPhone(phone)
                 .orElseThrow(() -> new BusinessRuleException("No account found for this phone number"));
 
@@ -103,22 +106,28 @@ public class UserService {
         otpCodeRepository.save(otp);
 
         auditService.log(user.getId(), "OTP_VERIFIED", "Login via OTP for " + phone);
-        return user;
+        return DtoMapper.toUserResponse(user);
     }
 
     @Transactional(readOnly = true)
-    public User getUser(Long id) {
+    public UserResponse getUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
-        return user;
+        return DtoMapper.toUserResponse(user);
     }
 
-    public List<User> getPendingUsers() {
-        return userRepository.findByAccountStatus(AccountStatus.PENDING);
+    @Transactional(readOnly = true)
+    public List<UserResponse> getPendingUsers() {
+        return userRepository.findByAccountStatus(AccountStatus.PENDING).stream()
+                .map(DtoMapper::toUserResponse)
+                .collect(Collectors.toList());
     }
 
-    public List<User> getAllActiveUsers() {
-        return userRepository.findByActiveTrue();
+    @Transactional(readOnly = true)
+    public List<UserResponse> getAllActiveUsers() {
+        return userRepository.findByActiveTrue().stream()
+                .map(DtoMapper::toUserResponse)
+                .collect(Collectors.toList());
     }
 
     private String generateCode() {

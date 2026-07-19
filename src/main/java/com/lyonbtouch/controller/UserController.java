@@ -25,41 +25,37 @@ public class UserController {
 
     @GetMapping("/pending")
     public ResponseEntity<List<UserResponse>> getPendingUsers() {
-        List<UserResponse> users = userService.getPendingUsers().stream()
-                .map(DtoMapper::toUserResponse)
-                .collect(Collectors.toList());
+        List<UserResponse> users = userService.getPendingUsers();
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
-        User user = userService.getUser(id);
-        return ResponseEntity.ok(DtoMapper.toUserResponse(user));
+        UserResponse user = userService.getUser(id);
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllActiveUsers() {
-        List<UserResponse> users = userService.getAllActiveUsers().stream()
-                .map(DtoMapper::toUserResponse)
-                .collect(Collectors.toList());
+        List<UserResponse> users = userService.getAllActiveUsers();
         return ResponseEntity.ok(users);
     }
 
     @PutMapping("/{id}/approve")
     public ResponseEntity<UserResponse> approveUser(@PathVariable Long id,
                                                      @Valid @RequestBody ApproveUserRequest request) {
-        User user = managerService.approveUser(
+        UserResponse user = managerService.approveUser(
                 id, request.getSystemRole(),
                 request.getQualifications(), request.isChecker());
-        return ResponseEntity.ok(DtoMapper.toUserResponse(user));
+        return ResponseEntity.ok(user);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long id,
                                                     @Valid @RequestBody UpdateUserRequest request) {
-        User user = managerService.updateUserProfile(
+        UserResponse user = managerService.updateUserProfile(
                 id, request.getSystemRole(),
                 request.getQualifications(), request.getIsChecker(), request.getActive());
-        return ResponseEntity.ok(DtoMapper.toUserResponse(user));
+        return ResponseEntity.ok(user);
     }
 }

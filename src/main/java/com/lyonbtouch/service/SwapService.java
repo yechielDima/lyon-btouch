@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import com.lyonbtouch.dto.DtoMapper;
+import com.lyonbtouch.dto.SwapRequestResponse;
 
 @Service
 public class SwapService {
@@ -34,7 +37,7 @@ public class SwapService {
     }
 
     @Transactional
-    public SwapRequest openForSwap(Long entryId) {
+    public SwapRequestResponse openForSwap(Long entryId) {
         Long userId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
@@ -60,11 +63,11 @@ public class SwapService {
         SwapRequest saved = swapRequestRepository.save(swap);
         auditService.log(userId, "SWAP_OPEN",
                 "Opened shift entry " + entryId + " for swap");
-        return saved;
+        return DtoMapper.toSwapResponse(saved);
     }
 
     @Transactional
-    public SwapRequest offerToCover(Long swapRequestId) {
+    public SwapRequestResponse offerToCover(Long swapRequestId) {
         Long userId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User coveringUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
@@ -90,11 +93,11 @@ public class SwapService {
         SwapRequest saved = swapRequestRepository.save(swap);
         auditService.log(userId, "SWAP_OFFER",
                 "Offered to cover swap request " + swapRequestId);
-        return saved;
+        return DtoMapper.toSwapResponse(saved);
     }
 
     @Transactional
-    public SwapRequest approveSwap(Long swapRequestId) {
+    public SwapRequestResponse approveSwap(Long swapRequestId) {
         Long approverId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User approver = userRepository.findById(approverId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + approverId));
@@ -122,11 +125,11 @@ public class SwapService {
 
         auditService.log(approverId, "SWAP_APPROVE",
                 "Approved swap request " + swapRequestId);
-        return saved;
+        return DtoMapper.toSwapResponse(saved);
     }
 
     @Transactional
-    public SwapRequest rejectSwap(Long swapRequestId) {
+    public SwapRequestResponse rejectSwap(Long swapRequestId) {
         Long approverId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User approver = userRepository.findById(approverId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + approverId));
@@ -145,11 +148,11 @@ public class SwapService {
 
         auditService.log(approverId, "SWAP_REJECT",
                 "Rejected swap request " + swapRequestId);
-        return saved;
+        return DtoMapper.toSwapResponse(saved);
     }
 
     @Transactional
-    public SwapRequest cancelSwap(Long swapRequestId) {
+    public SwapRequestResponse cancelSwap(Long swapRequestId) {
         Long userId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
@@ -169,21 +172,30 @@ public class SwapService {
 
         auditService.log(userId, "SWAP_CANCEL",
                 "Cancelled swap request " + swapRequestId);
-        return saved;
+        return DtoMapper.toSwapResponse(saved);
     }
 
-    public List<SwapRequest> getSwapsByStatus(SwapStatus status) {
-        return swapRequestRepository.findByStatus(status);
+    @Transactional(readOnly = true)
+    public List<SwapRequestResponse> getSwapsByStatus(SwapStatus status) {
+        return swapRequestRepository.findByStatus(status).stream()
+                .map(DtoMapper::toSwapResponse)
+                .collect(Collectors.toList());
     }
 
-    public List<SwapRequest> getSwapsForUser(Long userId) {
+    @Transactional(readOnly = true)
+    public List<SwapRequestResponse> getSwapsForUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
-        return swapRequestRepository.findByRequestingUser(user);
+        return swapRequestRepository.findByRequestingUser(user).stream()
+                .map(DtoMapper::toSwapResponse)
+                .collect(Collectors.toList());
     }
 
-    public List<SwapRequest> getAllSwaps() {
-        return swapRequestRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<SwapRequestResponse> getAllSwaps() {
+        return swapRequestRepository.findAll().stream()
+                .map(DtoMapper::toSwapResponse)
+                .collect(Collectors.toList());
     }
 
     private void validateApproverAuthority(User approver, SwapRequest swap) {

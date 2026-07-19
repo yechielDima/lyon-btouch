@@ -24,41 +24,41 @@ public class SwapController {
 
     @PostMapping
     public ResponseEntity<SwapRequestResponse> openForSwap(@Valid @RequestBody SwapOpenRequest request) {
-        SwapRequest swap = swapService.openForSwap(request.getEntryId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(DtoMapper.toSwapResponse(swap));
+        SwapRequestResponse swap = swapService.openForSwap(request.getEntryId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(swap);
     }
 
     @PutMapping("/{id}/offer")
     public ResponseEntity<SwapRequestResponse> offerToCover(@PathVariable Long id,
                                                              @Valid @RequestBody SwapOfferRequest request) {
-        SwapRequest swap = swapService.offerToCover(id);
-        return ResponseEntity.ok(DtoMapper.toSwapResponse(swap));
+        SwapRequestResponse swap = swapService.offerToCover(id);
+        return ResponseEntity.ok(swap);
     }
 
     @PutMapping("/{id}/approve")
     public ResponseEntity<SwapRequestResponse> approveSwap(@PathVariable Long id,
                                                             @Valid @RequestBody SwapActionRequest request) {
-        SwapRequest swap = swapService.approveSwap(id);
-        return ResponseEntity.ok(DtoMapper.toSwapResponse(swap));
+        SwapRequestResponse swap = swapService.approveSwap(id);
+        return ResponseEntity.ok(swap);
     }
 
     @PutMapping("/{id}/reject")
     public ResponseEntity<SwapRequestResponse> rejectSwap(@PathVariable Long id,
                                                            @Valid @RequestBody SwapActionRequest request) {
-        SwapRequest swap = swapService.rejectSwap(id);
-        return ResponseEntity.ok(DtoMapper.toSwapResponse(swap));
+        SwapRequestResponse swap = swapService.rejectSwap(id);
+        return ResponseEntity.ok(swap);
     }
 
     @PutMapping("/{id}/cancel")
     public ResponseEntity<SwapRequestResponse> cancelSwap(@PathVariable Long id) {
-        SwapRequest swap = swapService.cancelSwap(id);
-        return ResponseEntity.ok(DtoMapper.toSwapResponse(swap));
+        SwapRequestResponse swap = swapService.cancelSwap(id);
+        return ResponseEntity.ok(swap);
     }
 
     @GetMapping
     public ResponseEntity<List<SwapRequestResponse>> getSwaps(@RequestParam(required = false) SwapStatus status,
                                                                @RequestParam(required = false) Long userId) {
-        List<SwapRequest> swaps;
+        List<SwapRequestResponse> swaps;
         if (status != null) {
             swaps = swapService.getSwapsByStatus(status);
         } else if (userId != null) {
@@ -67,9 +67,6 @@ public class SwapController {
             swaps = swapService.getAllSwaps();
         }
 
-        List<SwapRequestResponse> responses = swaps.stream()
-                .map(DtoMapper::toSwapResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(responses);
+        return ResponseEntity.ok(swaps);
     }
 }
