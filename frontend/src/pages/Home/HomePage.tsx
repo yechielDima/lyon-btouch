@@ -36,6 +36,13 @@ export default function HomePage() {
         )}
 
         <button
+          onClick={() => navigate('/availability')}
+          className="w-full py-3 mb-4 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white font-semibold transition-colors cursor-pointer"
+        >
+          הגשת זמינות
+        </button>
+
+        <button
           onClick={handleLogout}
           className="w-full py-3 rounded-xl bg-red-500/80 hover:bg-red-500 text-white font-semibold transition-colors cursor-pointer"
         >

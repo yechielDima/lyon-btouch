@@ -4,6 +4,7 @@ import RegisterPage from './pages/Register/RegisterPage'
 import HomePage from './pages/Home/HomePage'
 import ApprovalPage from './pages/Approvals/ApprovalPage'
 import ScheduleBuilderPage from './pages/Schedule/ScheduleBuilderPage'
+import AvailabilityPage from './pages/Availability/AvailabilityPage'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import { SystemRole } from './api/types'
@@ -19,6 +20,7 @@ function App() {
           
           <Route element={<ProtectedRoute />}>
             <Route path="/home" element={<HomePage />} />
+            <Route path="/availability" element={<AvailabilityPage />} />
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={[SystemRole.MANAGER]} />}>

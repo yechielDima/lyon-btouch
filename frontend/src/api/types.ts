@@ -99,6 +99,16 @@ export interface ScaffoldWeekRequest {
   weekStartDate: string
 }
 
+export interface AvailabilityResponse {
+  id: number
+  userId: number
+  shiftId: number
+}
+
+export interface AvailabilityRequest {
+  shiftId: number
+}
+
 export interface ApiError {
   message: string
   status: number

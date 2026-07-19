@@ -5,6 +5,8 @@ import type {
   ShiftRequirementResponse,
   ShiftRequirementRequest,
   ScaffoldWeekRequest,
+  AvailabilityResponse,
+  AvailabilityRequest,
 } from './types'
 
 export const scheduleApi = {
@@ -38,5 +40,17 @@ export const scheduleApi = {
 
   setShiftRequirement: (shiftId: number, request: ShiftRequirementRequest) => {
     return api.post<ShiftRequirementResponse>(`/shifts/${shiftId}/requirements`, request)
+  },
+
+  getUserAvailability: (userId: number) => {
+    return api.get<AvailabilityResponse[]>(`/users/${userId}/availability`)
+  },
+
+  submitAvailability: (request: AvailabilityRequest) => {
+    return api.post<AvailabilityResponse>('/availability', request)
+  },
+
+  removeAvailability: (shiftId: number) => {
+    return api.delete<void>(`/availability?shiftId=${shiftId}`)
   },
 }
