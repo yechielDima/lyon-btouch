@@ -38,10 +38,8 @@ export default function ShiftCard({ shift, weekStatus, onDelete }: ShiftCardProp
   const isEditable = weekStatus !== WeekStatus.PUBLISHED
 
   useEffect(() => {
-    if (expanded) {
-      loadRequirements()
-    }
-  }, [expanded])
+    loadRequirements()
+  }, [shift.id])
 
   const loadRequirements = async () => {
     try {
