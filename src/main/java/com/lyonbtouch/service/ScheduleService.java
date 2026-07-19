@@ -3,6 +3,7 @@ package com.lyonbtouch.service;
 import com.lyonbtouch.exception.BusinessRuleException;
 import com.lyonbtouch.exception.ResourceNotFoundException;
 import com.lyonbtouch.exception.UnauthorizedException;
+import com.lyonbtouch.dto.*;
 import com.lyonbtouch.model.*;
 import com.lyonbtouch.model.enums.*;
 import com.lyonbtouch.repository.*;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ScheduleService {
@@ -47,7 +49,7 @@ public class ScheduleService {
     }
 
     @Transactional
-    public ScheduleWeek createWeek(LocalDate weekStartDate) {
+    public ScheduleWeekResponse createWeek(LocalDate weekStartDate) {
         Long managerId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User manager = requireManager(managerId);
 
@@ -61,20 +63,23 @@ public class ScheduleService {
 
         ScheduleWeek saved = scheduleWeekRepository.save(week);
         auditService.log(managerId, "WEEK_CREATE", "Created schedule week starting " + weekStartDate);
-        return saved;
+        return DtoMapper.toWeekResponse(saved);
     }
 
-    public ScheduleWeek getWeek(Long weekId) {
-        return scheduleWeekRepository.findById(weekId)
+    public ScheduleWeekResponse getWeek(Long weekId) {
+        ScheduleWeek week = scheduleWeekRepository.findById(weekId)
                 .orElseThrow(() -> new ResourceNotFoundException("ScheduleWeek not found: " + weekId));
+        return DtoMapper.toWeekResponse(week);
     }
 
-    public List<ScheduleWeek> getAllWeeks() {
-        return scheduleWeekRepository.findAll();
+    public List<ScheduleWeekResponse> getAllWeeks() {
+        return scheduleWeekRepository.findAll().stream()
+                .map(DtoMapper::toWeekResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public Shift addShift(Long weekId, LocalDate shiftDate, ShiftType shiftType) {
+    public ShiftResponse addShift(Long weekId, LocalDate shiftDate, ShiftType shiftType) {
         Long managerId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User manager = requireManager(managerId);
         ScheduleWeek week = scheduleWeekRepository.findById(weekId)
@@ -96,23 +101,26 @@ public class ScheduleService {
         Shift saved = shiftRepository.save(shift);
         auditService.log(managerId, "SHIFT_CREATE",
                 "Created " + shiftType + " shift on " + shiftDate);
-        return saved;
+        return DtoMapper.toShiftResponse(saved);
     }
 
-    public Shift getShift(Long shiftId) {
-        return shiftRepository.findById(shiftId)
+    public ShiftResponse getShift(Long shiftId) {
+        Shift shift = shiftRepository.findById(shiftId)
                 .orElseThrow(() -> new ResourceNotFoundException("Shift not found: " + shiftId));
+        return DtoMapper.toShiftResponse(shift);
     }
 
     @Transactional(readOnly = true)
-    public List<Shift> getShiftsForWeek(Long weekId) {
+    public List<ShiftResponse> getShiftsForWeek(Long weekId) {
         ScheduleWeek week = scheduleWeekRepository.findById(weekId)
                 .orElseThrow(() -> new ResourceNotFoundException("ScheduleWeek not found: " + weekId));
-        return shiftRepository.findByWeek(week);
+        return shiftRepository.findByWeek(week).stream()
+                .map(DtoMapper::toShiftResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public ShiftRequirement setShiftRequirement(Long shiftId,
+    public ShiftRequirementResponse setShiftRequirement(Long shiftId,
                                                  PositionCode positionCode, int requiredCount) {
         Long managerId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User manager = requireManager(managerId);
@@ -131,18 +139,21 @@ public class ScheduleService {
                 });
 
         requirement.setRequiredCount(requiredCount);
-        return shiftRequirementRepository.save(requirement);
+        ShiftRequirement saved = shiftRequirementRepository.save(requirement);
+        return DtoMapper.toRequirementResponse(saved);
     }
 
     @Transactional(readOnly = true)
-    public List<ShiftRequirement> getRequirementsForShift(Long shiftId) {
+    public List<ShiftRequirementResponse> getRequirementsForShift(Long shiftId) {
         Shift shift = shiftRepository.findById(shiftId)
                 .orElseThrow(() -> new ResourceNotFoundException("Shift not found: " + shiftId));
-        return shiftRequirementRepository.findByShift(shift);
+        return shiftRequirementRepository.findByShift(shift).stream()
+                .map(DtoMapper::toRequirementResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public Shift assignShiftManager(Long shiftId, Long userId) {
+    public ShiftResponse assignShiftManager(Long shiftId, Long userId) {
         Long managerId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User manager = requireManager(managerId);
         Shift shift = shiftRepository.findById(shiftId)
@@ -162,11 +173,11 @@ public class ScheduleService {
         Shift saved = shiftRepository.save(shift);
         auditService.log(managerId, "SHIFT_MANAGER_ASSIGN",
                 "Assigned " + user.getFullName() + " as shift manager for shift " + shiftId);
-        return saved;
+        return DtoMapper.toShiftResponse(saved);
     }
 
     @Transactional
-    public ScheduleEntry assignEntry(Long shiftId, Long userId, PositionCode positionCode) {
+    public ScheduleEntryResponse assignEntry(Long shiftId, Long userId, PositionCode positionCode) {
         Long managerId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User manager = requireManager(managerId);
         Shift shift = shiftRepository.findById(shiftId)
@@ -198,7 +209,7 @@ public class ScheduleService {
         ScheduleEntry saved = scheduleEntryRepository.save(entry);
         auditService.log(managerId, "ENTRY_ASSIGN",
                 "Assigned " + user.getFullName() + " as " + positionCode + " for shift " + shiftId);
-        return saved;
+        return DtoMapper.toEntryResponse(saved);
     }
 
     @Transactional
@@ -214,14 +225,16 @@ public class ScheduleService {
     }
 
     @Transactional(readOnly = true)
-    public List<ScheduleEntry> getEntriesForShift(Long shiftId) {
+    public List<ScheduleEntryResponse> getEntriesForShift(Long shiftId) {
         Shift shift = shiftRepository.findById(shiftId)
                 .orElseThrow(() -> new ResourceNotFoundException("Shift not found: " + shiftId));
-        return scheduleEntryRepository.findByShift(shift);
+        return scheduleEntryRepository.findByShift(shift).stream()
+                .map(DtoMapper::toEntryResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public ScheduleWeek publishWeek(Long weekId) {
+    public ScheduleWeekResponse publishWeek(Long weekId) {
         Long managerId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User manager = requireManager(managerId);
         ScheduleWeek week = scheduleWeekRepository.findById(weekId)
@@ -237,11 +250,11 @@ public class ScheduleService {
         ScheduleWeek saved = scheduleWeekRepository.save(week);
         auditService.log(managerId, "WEEK_PUBLISH",
                 "Published schedule week starting " + week.getWeekStartDate());
-        return saved;
+        return DtoMapper.toWeekResponse(saved);
     }
 
     @Transactional
-    public ScheduleWeek openWeek(Long weekId) {
+    public ScheduleWeekResponse openWeek(Long weekId) {
         Long managerId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User manager = requireManager(managerId);
         ScheduleWeek week = scheduleWeekRepository.findById(weekId)
@@ -259,11 +272,11 @@ public class ScheduleService {
         ScheduleWeek saved = scheduleWeekRepository.save(week);
         auditService.log(managerId, "WEEK_OPEN",
                 "Opened schedule week starting " + week.getWeekStartDate() + " for submission");
-        return saved;
+        return DtoMapper.toWeekResponse(saved);
     }
 
     @Transactional
-    public ScheduleWeek scaffoldWeek(LocalDate weekStartDate) {
+    public ScheduleWeekResponse scaffoldWeek(LocalDate weekStartDate) {
         Long managerId = com.lyonbtouch.security.SecurityUtils.getCurrentUserId();
         User manager = requireManager(managerId);
 
@@ -308,7 +321,7 @@ public class ScheduleService {
         shiftRepository.save(motzash);
 
         auditService.log(managerId, "WEEK_SCAFFOLD", "Scaffolded schedule week starting " + weekStartDate);
-        return savedWeek;
+        return DtoMapper.toWeekResponse(savedWeek);
     }
 
     @Transactional

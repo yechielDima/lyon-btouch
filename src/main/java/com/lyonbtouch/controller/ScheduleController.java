@@ -23,40 +23,32 @@ public class ScheduleController {
 
     @PostMapping("/schedule-weeks")
     public ResponseEntity<ScheduleWeekResponse> createWeek(@Valid @RequestBody CreateWeekRequest request) {
-        ScheduleWeek week = scheduleService.createWeek(request.getWeekStartDate());
-        return ResponseEntity.status(HttpStatus.CREATED).body(DtoMapper.toWeekResponse(week));
+        return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.createWeek(request.getWeekStartDate()));
     }
 
     @GetMapping("/schedule-weeks")
     public ResponseEntity<List<ScheduleWeekResponse>> getAllWeeks() {
-        List<ScheduleWeekResponse> weeks = scheduleService.getAllWeeks().stream()
-                .map(DtoMapper::toWeekResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(weeks);
+        return ResponseEntity.ok(scheduleService.getAllWeeks());
     }
 
     @GetMapping("/schedule-weeks/{id}")
     public ResponseEntity<ScheduleWeekResponse> getWeek(@PathVariable Long id) {
-        ScheduleWeek week = scheduleService.getWeek(id);
-        return ResponseEntity.ok(DtoMapper.toWeekResponse(week));
+        return ResponseEntity.ok(scheduleService.getWeek(id));
     }
 
     @PutMapping("/schedule-weeks/{id}/publish")
     public ResponseEntity<ScheduleWeekResponse> publishWeek(@PathVariable Long id) {
-        ScheduleWeek week = scheduleService.publishWeek(id);
-        return ResponseEntity.ok(DtoMapper.toWeekResponse(week));
+        return ResponseEntity.ok(scheduleService.publishWeek(id));
     }
 
     @PutMapping("/schedule-weeks/{id}/open")
     public ResponseEntity<ScheduleWeekResponse> openWeek(@PathVariable Long id) {
-        ScheduleWeek week = scheduleService.openWeek(id);
-        return ResponseEntity.ok(DtoMapper.toWeekResponse(week));
+        return ResponseEntity.ok(scheduleService.openWeek(id));
     }
 
     @PostMapping("/schedule-weeks/scaffold")
     public ResponseEntity<ScheduleWeekResponse> scaffoldWeek(@Valid @RequestBody ScaffoldWeekRequest request) {
-        ScheduleWeek week = scheduleService.scaffoldWeek(request.getWeekStartDate());
-        return ResponseEntity.status(HttpStatus.CREATED).body(DtoMapper.toWeekResponse(week));
+        return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.scaffoldWeek(request.getWeekStartDate()));
     }
 
     @DeleteMapping("/shifts/{id}")
@@ -67,55 +59,43 @@ public class ScheduleController {
 
     @PostMapping("/shifts")
     public ResponseEntity<ShiftResponse> addShift(@Valid @RequestBody AddShiftRequest request) {
-        Shift shift = scheduleService.addShift(
-                request.getWeekId(),
-                request.getShiftDate(), request.getShiftType());
-        return ResponseEntity.status(HttpStatus.CREATED).body(DtoMapper.toShiftResponse(shift));
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                scheduleService.addShift(request.getWeekId(), request.getShiftDate(), request.getShiftType())
+        );
     }
 
     @GetMapping("/shifts/{id}")
     public ResponseEntity<ShiftResponse> getShift(@PathVariable Long id) {
-        Shift shift = scheduleService.getShift(id);
-        return ResponseEntity.ok(DtoMapper.toShiftResponse(shift));
+        return ResponseEntity.ok(scheduleService.getShift(id));
     }
 
     @GetMapping("/schedule-weeks/{weekId}/shifts")
     public ResponseEntity<List<ShiftResponse>> getShiftsForWeek(@PathVariable Long weekId) {
-        List<ShiftResponse> shifts = scheduleService.getShiftsForWeek(weekId).stream()
-                .map(DtoMapper::toShiftResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(shifts);
+        return ResponseEntity.ok(scheduleService.getShiftsForWeek(weekId));
     }
 
     @PutMapping("/shifts/{id}/shift-manager")
     public ResponseEntity<ShiftResponse> assignShiftManager(@PathVariable Long id,
                                                              @Valid @RequestBody AssignShiftManagerRequest request) {
-        Shift shift = scheduleService.assignShiftManager(id, request.getUserId());
-        return ResponseEntity.ok(DtoMapper.toShiftResponse(shift));
+        return ResponseEntity.ok(scheduleService.assignShiftManager(id, request.getUserId()));
     }
 
     @PostMapping("/shifts/{id}/requirements")
     public ResponseEntity<ShiftRequirementResponse> setShiftRequirement(@PathVariable Long id,
                                                                          @Valid @RequestBody ShiftRequirementRequest request) {
-        ShiftRequirement req = scheduleService.setShiftRequirement(
-                id, request.getPositionCode(), request.getRequiredCount());
-        return ResponseEntity.ok(DtoMapper.toRequirementResponse(req));
+        return ResponseEntity.ok(scheduleService.setShiftRequirement(id, request.getPositionCode(), request.getRequiredCount()));
     }
 
     @GetMapping("/shifts/{id}/requirements")
     public ResponseEntity<List<ShiftRequirementResponse>> getRequirements(@PathVariable Long id) {
-        List<ShiftRequirementResponse> reqs = scheduleService.getRequirementsForShift(id).stream()
-                .map(DtoMapper::toRequirementResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(reqs);
+        return ResponseEntity.ok(scheduleService.getRequirementsForShift(id));
     }
 
     @PostMapping("/schedule-entries")
     public ResponseEntity<ScheduleEntryResponse> assignEntry(@Valid @RequestBody AssignEntryRequest request) {
-        ScheduleEntry entry = scheduleService.assignEntry(
-                request.getShiftId(),
-                request.getUserId(), request.getPositionCode());
-        return ResponseEntity.status(HttpStatus.CREATED).body(DtoMapper.toEntryResponse(entry));
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                scheduleService.assignEntry(request.getShiftId(), request.getUserId(), request.getPositionCode())
+        );
     }
 
     @DeleteMapping("/schedule-entries/{id}")
@@ -126,9 +106,6 @@ public class ScheduleController {
 
     @GetMapping("/shifts/{id}/entries")
     public ResponseEntity<List<ScheduleEntryResponse>> getEntriesForShift(@PathVariable Long id) {
-        List<ScheduleEntryResponse> entries = scheduleService.getEntriesForShift(id).stream()
-                .map(DtoMapper::toEntryResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(entries);
+        return ResponseEntity.ok(scheduleService.getEntriesForShift(id));
     }
 }
